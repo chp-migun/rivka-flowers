@@ -186,7 +186,13 @@ section{position:relative}
 .card-end{width:min(56vw, 260px);background:transparent;box-shadow:none;display:flex;align-items:center}
 .card-end::after{display:none}
 .card-end p{font-family:var(--f-hand);font-size:34px;line-height:1.1;color:var(--blush);opacity:1}
-.sv-progress{margin:clamp(16px,3svh,30px) var(--gutter) 0;height:2px;background:rgba(251,241,238,.16);border-radius:2px;overflow:hidden}
+.sv-nav{display:flex;align-items:center;gap:14px;margin:clamp(14px,2.6svh,28px) var(--gutter) 0}
+.sv-btn{flex:0 0 auto;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:rgba(251,241,238,.08);border:1px solid rgba(251,241,238,.45);color:var(--cream);cursor:pointer;transition:background .3s, scale .2s var(--ease)}
+.sv-btn:hover{background:rgba(251,241,238,.2)}
+.sv-btn:active{scale:.92}
+.sv-btn svg{width:20px;height:20px}
+.sv-btn[disabled]{opacity:.3;pointer-events:none}
+.sv-progress{flex:1;height:2px;background:rgba(251,241,238,.16);border-radius:2px;overflow:hidden}
 .sv-progress i{display:block;height:100%;background:var(--blush);transform-origin:right;transform:scaleX(0)}
 
 /* ===== הפסקה: דליה ===== */
@@ -396,7 +402,11 @@ footer .fc{margin-top:26px;font-size:13px;opacity:.5}
         <article class="card"><img src="img/lobby.jpg" alt="סידור פרחים גדול באגרטל קרמיקה בלובי" loading="lazy"><span class="num">06</span><div class="card-body"><h3>לבית ולעסק</h3><p>סידורים קבועים ללובי, למשרד ולחנות, שמתחלפים יחד עם העונה.</p><a class="ask" data-wa="סידורי פרחים לבית או לעסק" href="#"><svg viewBox="0 0 24 24"><use href="#wa"/></svg>לשאול על זה</a></div></article>
         <div class="card card-end"><p>ואם זה משהו אחר לגמרי, ספרו לי. נמציא את זה יחד.</p></div>
       </div>
-      <div class="sv-progress"><i id="svProg"></i></div>
+      <div class="sv-nav">
+        <button class="sv-btn" data-dir="-1" aria-label="לכרטיס הקודם"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="sv-progress"><i id="svProg"></i></div>
+        <button class="sv-btn" data-dir="1" aria-label="לכרטיס הבא"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 6l-6 6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </div>
     </div>
   </section>
 
@@ -570,9 +580,41 @@ gsap.utils.toArray('.collage [data-speed]').forEach(el => {
 /* ---------- שירותים: גלילה לרוחב ---------- */
 const track = document.getElementById('svTrack');
 const dist = () => Math.max(0, track.scrollWidth - innerWidth);
-gsap.to(track, {x:() => dist(), ease:'none',
+const svBtns = document.querySelectorAll('.sv-btn');
+const svTween = gsap.to(track, {x:() => dist(), ease:'none',
   scrollTrigger:{ trigger:'.services', start:'top top', end:() => '+=' + dist(), pin:true, scrub:.6, anticipatePin:1, invalidateOnRefresh:true,
-    onUpdate:s => gsap.set('#svProg', {scaleX:s.progress}) }});
+    onUpdate:s => { gsap.set('#svProg', {scaleX:s.progress}); svBtns[0].disabled = s.progress < .01; svBtns[1].disabled = s.progress > .99; } }});
+svBtns[0].disabled = true;
+
+/* גם לרוחב: החלקה עם האצבע, גלילה לצדדים במשטח המגע, וחצים.
+   כל תנועה לרוחב מתורגמת לגלילה של הדף, כך ששתי הדרכים תמיד מסונכרנות */
+const svSec = document.querySelector('.services');
+const svClampTo = y => { const st = svTween.scrollTrigger; return gsap.utils.clamp(st.start, st.end, y); };
+const svMove = d => window.scrollTo(0, svClampTo(scrollY + d));
+let sx = 0, sy = 0, lastX = 0, lastT = 0, vX = 0, lock = null, momId = 0;
+svSec.addEventListener('touchstart', e => { const t = e.touches[0]; sx = lastX = t.clientX; sy = t.clientY; lastT = performance.now(); lock = null; vX = 0; cancelAnimationFrame(momId); }, {passive:true});
+svSec.addEventListener('touchmove', e => {
+  const t = e.touches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+  if (lock === null && Math.hypot(dx, dy) > 8) lock = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+  if (lock !== 'x') return;
+  e.preventDefault();
+  const d = t.clientX - lastX, now = performance.now();
+  vX = d / Math.max(1, now - lastT) * 16; lastT = now; lastX = t.clientX;
+  svMove(d);   // האצבע ימינה = הכרטיסים זזים ימינה = הכרטיס הבא נחשף
+}, {passive:false});
+svSec.addEventListener('touchend', () => {
+  if (lock !== 'x') return;
+  let v = vX; const step = () => { v *= .93; if (Math.abs(v) < .4) return; svMove(v); momId = requestAnimationFrame(step); };
+  momId = requestAnimationFrame(step);
+}, {passive:true});
+svSec.addEventListener('wheel', e => {
+  if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
+  e.preventDefault(); svMove(-e.deltaX);
+}, {passive:false});
+svBtns.forEach(b => b.addEventListener('click', () => {
+  const card = track.querySelector('.card'), stepPx = card.offsetWidth + 14;
+  window.scrollTo({top: svClampTo(scrollY + stepPx * parseInt(b.dataset.dir, 10)), behavior:'smooth'});
+}));
 gsap.from('.services .sv-head > *', {y:36, opacity:0, duration:1, ease:'power3.out', stagger:.1, scrollTrigger:{trigger:'.services', start:'top 70%'}});
 
 /* ---------- דליה: מתרחקת ומסתובבת לאט ---------- */
@@ -630,7 +672,8 @@ function paint(){
   prog.querySelector('i').style.transform = `scaleY(${p})`;
   prog.querySelector('b').style.top = (p*100) + '%';
   const fin = document.querySelector('.finale').getBoundingClientRect();
-  fab.classList.toggle('show', scrollY > vh*2 && fin.top > vh*.7);
+  // הכפתור הצף מוסתר בסיום (יש שם כפתור גדול) ובשירותים (יש וואטסאפ בכל כרטיס, והוא היה מסתיר את החץ)
+  fab.classList.toggle('show', scrollY > vh*2 && fin.top > vh*.7 && !svTween.scrollTrigger.isActive);
   bar.classList.toggle('scrolled', scrollY > vh*.5);
 }
 ScrollTrigger.create({ start:0, end:'max', onUpdate:s => { paint(); vel = s.getVelocity(); } });
