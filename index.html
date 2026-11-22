@@ -114,7 +114,7 @@ section{position:relative}
 .hello{font-size:clamp(30px,8.5vw,46px);color:var(--blush);margin-bottom:6px;transform:rotate(-3deg)}
 .wordmark{font-family:var(--f-display);font-weight:400;font-size:clamp(80px, 25vw, 210px);line-height:.86;letter-spacing:-.02em;display:flex;flex-direction:column;align-items:center}
 .wordmark span:nth-child(2){color:var(--blush);margin-top:.04em}
-.tagline{margin-top:20px;font-size:clamp(14px,3.8vw,17px);letter-spacing:.04em;opacity:.8}
+.tagline{margin-top:20px;font-size:clamp(14px,3.8vw,17px);letter-spacing:.04em;opacity:.92;text-shadow:0 1px 3px rgba(20,0,5,.9), 0 2px 18px rgba(20,0,5,.8)}
 .hero-lines{position:absolute;inset-inline:0;top:calc(9svh + env(safe-area-inset-top,0px));display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 var(--gutter);pointer-events:none;text-shadow:0 2px 24px rgba(20,0,5,.85)}
 .hl{text-align:center;opacity:0}
 .hl.hand{font-size:clamp(34px,9.5vw,60px);color:var(--blush);line-height:1.05}
@@ -122,6 +122,14 @@ section{position:relative}
 .scroll-cue{position:absolute;bottom:calc(24px + var(--safe-b));left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--blush)}
 .scroll-cue span{font-size:24px;white-space:nowrap}
 .scroll-cue i{width:1px;height:44px;background:linear-gradient(var(--blush),transparent);animation:drip 2.2s cubic-bezier(.6,0,.3,1) infinite;transform-origin:top}
+@media (min-width:900px){
+  /* במחשב: "גללו" בפינה, והכותרת קטנה מעט כדי שהלוגו, השם והניצן ייכנסו במסך אחד */
+  .scroll-cue{left:auto;right:var(--gutter);transform:none;bottom:28px}
+  .hero-title{padding-bottom:18svh}
+  .wordmark{font-size:min(17svh, 170px)}
+  .hero-mark{width:min(10svh, 96px);margin-bottom:10px}
+  .hello{font-size:min(5svh, 42px)}
+}
 @keyframes drip{0%{transform:scaleY(0);opacity:1}60%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
 
 /* ===== שפע: מיצב בורדו ===== */
@@ -500,11 +508,20 @@ ScrollTrigger.config({ ignoreMobileResize:true });
 const H = () => innerHeight;
 
 /* ---------- פתיחה: הניצן נפתח (קצר: גלילה של מסך וחצי) ---------- */
+/* הניצן מתחיל תמיד מתחת לשורת "סטודיו לעיצוב פרחים" ומעל "גללו", בכל גודל מסך */
+function budStart(){
+  const box = document.getElementById('heroFlowerBox'), tag = document.querySelector('.tagline'), cue = document.getElementById('cue');
+  const w = box.offsetWidth, vh = H(), FLOWER = .72;            // הפרח עצמו תופס כ-72% מהתמונה
+  const top = tag.offsetTop + tag.offsetHeight + 18;             // מתחת לשורה
+  const bottom = innerWidth < 900 ? vh - (cue.offsetHeight + 34) : vh - 26;   // בטלפון מעל "גללו", במחשב "גללו" בפינה
+  const d = Math.max(90, Math.min(bottom - top, w*FLOWER*(innerWidth < 900 ? .46 : .3)));
+  return { scale: d / (w*FLOWER), y: top + d/2 - vh/2 };
+}
 const htl = gsap.timeline({ scrollTrigger:{ trigger:'.hero', start:'top top', end:() => '+=' + H()*1.05, pin:true, scrub:.6, anticipatePin:1, invalidateOnRefresh:true } });
 htl.to('#heroTitle', {y:() => -H()*.16, opacity:0, duration:.7, ease:'power1.in'}, 0)
    .to('#cue', {opacity:0, duration:.25}, 0)
    .to('#brand', {opacity:1, duration:.4}, .5)
-   .fromTo('#heroFlowerBox', {scale:() => innerWidth < 900 ? .46 : .3, y:() => H()*(innerWidth < 900 ? .24 : .22)}, {scale:1, y:() => H()*(innerWidth < 900 ? .09 : .12), duration:1.5, ease:'power2.inOut'}, 0)
+   .fromTo('#heroFlowerBox', {scale:() => budStart().scale, y:() => budStart().y}, {scale:1, y:() => H()*(innerWidth < 900 ? .09 : .12), duration:1.5, ease:'power2.inOut'}, 0)
    .fromTo('#heroFlowerBox', {rotation:-14}, {rotation:8, duration:1.6, ease:'none'}, 0)
    .to('.pf-open', {opacity:1, duration:1, ease:'power1.inOut'}, .35)
    .fromTo('.pf-bud', {scale:1}, {scale:1.08, duration:1.2}, .2)
