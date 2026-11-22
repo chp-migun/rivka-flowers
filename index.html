@@ -128,7 +128,14 @@ section{position:relative}
 .abund{min-height:100svh;overflow:hidden;display:flex;align-items:flex-end;margin-top:-24svh;z-index:3;border-radius:30px 30px 0 0;box-shadow:0 -30px 60px -20px rgba(10,0,3,.8)}
 .ab-pic{position:absolute;inset:0}
 .ab-pic img{width:100%;height:100%;object-fit:cover;transform-origin:50% 60%}
-.ab-shade{position:absolute;inset:0;background:linear-gradient(to top, rgba(18,3,6,.96) 0%, rgba(18,3,6,.72) 34%, rgba(18,3,6,0) 60%)}
+.ab-shade{position:absolute;inset:0;background:linear-gradient(to top, rgba(18,3,6,.96) 0%, rgba(18,3,6,.72) 34%, rgba(18,3,6,0) 60%), linear-gradient(to bottom, rgba(18,3,6,.6) 0%, rgba(18,3,6,0) 34%)}
+/* כותרת שכל אות בה מתחילה כפרח שנופל */
+.ab-top{position:absolute;top:0;inset-inline:0;z-index:2;padding:8svh var(--gutter) 0}
+.ab-title{font-size:clamp(62px,17.5vw,150px);line-height:.98;text-shadow:0 4px 30px rgba(20,0,5,.75)}
+.wd{display:inline-block;white-space:nowrap}
+.lt{position:relative;display:inline-block}
+.lf{position:absolute;left:50%;top:50%;width:.82em;height:.82em;margin:-.41em 0 0 -.41em;object-fit:contain;pointer-events:none;opacity:0;filter:drop-shadow(0 6px 12px rgba(10,0,3,.5))}
+.rm .lf{display:none}
 .ab-text{position:relative;padding:0 var(--gutter) calc(8svh + var(--safe-b));max-width:760px}
 .ab-text .lead{margin-top:16px}
 
@@ -323,9 +330,9 @@ footer .fc{margin-top:26px;font-size:13px;opacity:.5}
       <img id="abImg" src="img/abundance-v.jpg" alt="מיצב פרחים בגוני בורדו: שולחן עטוף קטיפה, סחלבים, דליות ורימונים" loading="lazy">
     </picture>
     <div class="ab-shade"></div>
+    <div class="ab-top"><h2 class="h2 ab-title" id="abTitle">כשכל החדר<br>פורח</h2></div>
     <div class="ab-text" data-reveal>
       <p class="kicker">עיצוב אירועים</p>
-      <h2 class="h2">כשכל החדר<br>פורח</h2>
       <p class="lead">קטיפה שנשפכת, סחלבים, דליות ורימונים בין הפרחים, הכל בגוון אחד עמוק. לחתונות, לבר ובת מצווה ולכל ערב שרוצים שיישאר בזיכרון.</p>
     </div>
   </section>
@@ -463,6 +470,25 @@ document.querySelectorAll('[data-wa]').forEach(a => {
   a.target = '_blank'; a.rel = 'noopener';
 });
 
+/* אקראיות קבועה, כך שכל טעינה נראית אותו דבר */
+function rng(seed){ return () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+/* מפרקים את הכותרת "כשכל החדר פורח" לאותיות, ולכל אות פרח קטן משלה */
+(() => {
+  const t = document.getElementById('abTitle'); let n = 0;
+  t.setAttribute('aria-label', t.textContent.replace(/\s+/g, ' ').trim());
+  [...t.childNodes].forEach(node => {
+    if (node.nodeType !== 3 || !node.textContent.trim()) return;
+    const frag = document.createDocumentFragment(), words = node.textContent.trim().split(/\s+/);
+    words.forEach((word, wi) => {
+      const w = document.createElement('span'); w.className = 'wd'; w.setAttribute('aria-hidden', 'true');
+      [...word].forEach(ch => { const s = document.createElement('span'); s.className = 'lt'; s.innerHTML = `<span class="ch" style="display:inline-block">${ch}</span><img class="lf" src="img/petals/f${(n*7 + 3) % 16}.png" alt="">`; w.appendChild(s); n++; });
+      frag.appendChild(w); if (wi < words.length - 1) frag.appendChild(document.createTextNode(' '));
+    });
+    node.replaceWith(frag);
+  });
+})();
+
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
 if (reduce || !window.gsap || !window.ScrollTrigger){
   document.documentElement.classList.add('rm');
@@ -495,6 +521,16 @@ gsap.utils.toArray('[data-reveal]').forEach(el => {
 
 /* ---------- שפע: התמונה מתקרבת לאט ---------- */
 gsap.fromTo('#abImg', {scale:1.18}, {scale:1, ease:'none', scrollTrigger:{trigger:'.abund', start:'top bottom', end:'bottom top', scrub:true}});
+
+/* כל אות בכותרת נופלת מלמעלה כפרח אמיתי, נוחתת במקומה והופכת לאות */
+const ltl = gsap.timeline({ scrollTrigger:{ trigger:'.abund', start:'top 96%', end:'top 12%', scrub:.6 } });
+gsap.utils.toArray('#abTitle .lt').forEach((lt, i) => {
+  const r = rng(700 + i), img = lt.querySelector('.lf'), ch = lt.querySelector('.ch'), at = i*.09;
+  ltl.fromTo(img, {y:-(140 + r()*260), x:(r()-.5)*90, rotation:(r()-.5)*360, scale:.55, opacity:0},
+                  {y:0, x:0, rotation:0, scale:1.1, opacity:1, duration:1, ease:'power2.out'}, at)
+     .to(img, {scale:0, opacity:0, rotation:(r()-.5)*160, duration:.45, ease:'power2.in'}, at + .95)
+     .fromTo(ch, {opacity:0, scale:.2, y:10}, {opacity:1, scale:1, y:0, duration:.45, ease:'back.out(2)'}, at + 1);
+});
 
 /* ---------- השוק: שעון מתקתק, שמות פרחים צפים, צילום נחשף ---------- */
 const clock = document.getElementById('clock');
