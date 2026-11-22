@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>רבקה דרקסלר · סטודיו לפרחים</title>
+<meta name="description" content="רבקה דרקסלר, סטודיו לעיצוב פרחים: זרי כלה, חופות ואולמות, מרכזי שולחן, פרחים לשבת וזרים למתנה. כל זר נבנה ביד, בשבילכם.">
+<meta name="theme-color" content="#1E0408">
+<link rel="preload" as="image" href="img/peony-bud.jpg">
+<link rel="preload" as="image" href="img/peony-open.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Amatic+SC:wght@700&family=Bellefair&family=Rubik:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#1E0408;
+  --burgundy:#4A0414;
+  --wine:#74172E;
+  --blush:#E8BCB2;
+  --petal:#E3C4BB;
+  --cream:#FBF1EE;
+  --ink:#2B1519;
+  --mauve:#6A5154;
+  --f-display:'Bellefair', 'Frank Ruhl Libre', serif;
+  --f-hand:'Amatic SC', cursive;
+  --f-body:'Rubik', system-ui, sans-serif;
+  --gutter:clamp(20px, 6vw, 64px);
+  --safe-b:env(safe-area-inset-bottom, 0px);
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--f-body);font-weight:300;color:var(--cream);background:var(--night);
+  overflow-x:hidden;-webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;
+}
+a{color:inherit;text-decoration:none}
+img{display:block;max-width:100%}
+figure{margin:0}
+
+/* רקע חי: הצבע זורם בין הפרקים, מעליו גרעיניות דקה */
+#backdrop{position:fixed;inset:0;z-index:-3;background:var(--night)}
+.grain{
+  position:fixed;inset:0;z-index:-2;pointer-events:none;opacity:.08;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 .92 0 0 0 0 .9 0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+#petals{position:fixed;inset:0;z-index:30;pointer-events:none}
+
+/* טיפוגרפיה */
+.hand{font-family:var(--f-hand);font-weight:700;letter-spacing:.02em}
+.display{font-family:var(--f-display);font-weight:400}
+.h2{font-family:var(--f-display);font-weight:400;font-size:clamp(44px, 12vw, 104px);line-height:.98;letter-spacing:-.01em;text-wrap:balance}
+.lead{font-size:clamp(17px, 4.4vw, 20px);line-height:1.75;opacity:.88;max-width:34ch;text-wrap:pretty}
+.kicker{display:inline-flex;align-items:center;gap:12px;font-family:var(--f-hand);font-weight:700;font-size:clamp(25px,6.6vw,32px);color:var(--blush);margin-bottom:14px}
+.kicker::after{content:"";width:46px;height:1px;background:currentColor;opacity:.6}
+.light{color:var(--ink)}
+.light .kicker{color:var(--wine)}
+.photo{position:relative;overflow:hidden;border-radius:26px;background:#3a0a14}
+.photo img{width:100%;height:100%;object-fit:cover}
+
+/* סרגל עליון, גבעול התקדמות וכפתור צף */
+.bar{position:fixed;top:0;inset-inline:0;z-index:50;display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top,0px)) var(--gutter) 14px;color:var(--cream);transition:color .5s ease;pointer-events:none}
+.bar > *{pointer-events:auto}
+.bar::before{content:"";position:absolute;inset:0 0 -24px;z-index:-1;pointer-events:none;opacity:0;transition:opacity .5s;-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);-webkit-mask-image:linear-gradient(#000 55%, transparent);mask-image:linear-gradient(#000 55%, transparent)}
+.bar.scrolled::before{opacity:1}
+.bar.on-light{color:var(--ink)}
+.brand{font-family:var(--f-display);font-size:22px;opacity:0;text-shadow:0 1px 14px rgba(20,0,5,.35)}
+.bar.on-light .brand{text-shadow:none}
+.bar-cta{display:none;align-items:center;gap:10px;padding:11px 20px;border-radius:999px;font-size:15px;font-weight:400;border:1px solid currentColor;backdrop-filter:blur(8px);transition:transform .3s var(--ease)}
+.bar-cta svg{width:18px;height:18px}
+.bar-cta:hover{transform:translateY(-2px)}
+@media (min-width:900px){ .bar-cta{display:inline-flex} }
+.prog{position:fixed;left:12px;top:50%;height:36vh;width:2px;transform:translateY(-50%);z-index:40;color:var(--blush);transition:color .5s}
+.prog::before{content:"";position:absolute;inset:0;background:currentColor;opacity:.2;border-radius:2px}
+.prog i{position:absolute;inset:0;background:currentColor;transform-origin:top;transform:scaleY(0);border-radius:2px}
+.prog b{position:absolute;left:50%;top:0;width:9px;height:9px;margin:-4px 0 0 -4.5px;border-radius:50% 0 50% 50%;background:currentColor;transform:rotate(-45deg)}
+.prog.on-light{color:var(--wine)}
+@media (min-width:900px){ .prog{left:24px} }
+.fab{position:fixed;z-index:60;left:18px;bottom:calc(18px + var(--safe-b));width:60px;height:60px;border-radius:50%;display:grid;place-items:center;background:var(--cream);color:var(--wine);box-shadow:0 10px 30px -8px rgba(30,4,8,.6);transform:scale(0);transition:transform .5s cubic-bezier(.2,1.4,.4,1), background .4s, color .4s}
+.fab.show{transform:scale(1)}
+.fab.on-light{background:var(--wine);color:var(--cream)}
+.fab svg{width:28px;height:28px}
+.fab::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:1px solid currentColor;opacity:0;animation:ring 3.2s ease-out infinite}
+@keyframes ring{0%{transform:scale(.85);opacity:.5}70%,100%{transform:scale(1.35);opacity:0}}
+@media (min-width:900px){ .fab{display:none} }
+
+section{position:relative}
+
+/* ===== פתיחה: ניצן אמיתי שנפתח ===== */
+.hero{height:100svh;overflow:hidden}
+.hero-flower-pos{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+#heroFlowerBox{position:relative;flex:0 0 auto;width:min(150vw, 104svh, 1000px);aspect-ratio:1;will-change:transform}
+.pf{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  -webkit-mask-image:radial-gradient(closest-side, #000 58%, transparent 99%);mask-image:radial-gradient(closest-side, #000 58%, transparent 99%)}
+.pf-open{opacity:0}
+@media (min-width:900px){
+  #heroFlowerBox{width:min(84svh, 860px)}
+  .hero-title{padding-bottom:34svh}
+  .hero-lines{bottom:calc(6svh + var(--safe-b))}
+}
+.hero-title{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 var(--gutter) 30svh;text-shadow:0 2px 30px rgba(20,0,5,.5)}
+.hello{font-size:clamp(30px,8.5vw,46px);color:var(--blush);margin-bottom:6px;transform:rotate(-3deg)}
+.wordmark{font-family:var(--f-display);font-weight:400;font-size:clamp(80px, 25vw, 210px);line-height:.86;letter-spacing:-.02em;display:flex;flex-direction:column;align-items:center}
+.wordmark span:nth-child(2){color:var(--blush);margin-top:.04em}
+.tagline{margin-top:20px;font-size:clamp(14px,3.8vw,17px);letter-spacing:.04em;opacity:.8}
+.hero-lines{position:absolute;inset-inline:0;bottom:calc(11svh + var(--safe-b));display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 var(--gutter);pointer-events:none;text-shadow:0 2px 24px rgba(20,0,5,.85)}
+.hl{text-align:center;opacity:0}
+.hl.hand{font-size:clamp(34px,9.5vw,60px);color:var(--blush);line-height:1.05}
+.hl.display{font-size:clamp(46px,13vw,110px);line-height:1;letter-spacing:-.01em;text-wrap:balance}
+.scroll-cue{position:absolute;bottom:calc(24px + var(--safe-b));left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;color:var(--blush)}
+.scroll-cue span{font-size:24px;white-space:nowrap}
+.scroll-cue i{width:1px;height:44px;background:linear-gradient(var(--blush),transparent);animation:drip 2.2s cubic-bezier(.6,0,.3,1) infinite;transform-origin:top}
+@keyframes drip{0%{transform:scaleY(0);opacity:1}60%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
+
+/* ===== שפע: מיצב בורדו ===== */
+.abund{min-height:118svh;overflow:hidden;display:flex;align-items:flex-end}
+.ab-pic{position:absolute;inset:0}
+.ab-pic img{width:100%;height:100%;object-fit:cover;transform-origin:50% 60%}
+.ab-shade{position:absolute;inset:0;background:linear-gradient(to top, rgba(18,3,6,.96) 0%, rgba(18,3,6,.75) 32%, rgba(18,3,6,0) 62%), linear-gradient(to bottom, rgba(30,4,8,1) 0%, rgba(30,4,8,0) 18%)}
+.ab-text{position:relative;padding:0 var(--gutter) calc(14svh + var(--safe-b));max-width:760px}
+.ab-text .lead{margin-top:16px}
+
+/* ===== השוק ===== */
+.market{padding:12svh var(--gutter) 16svh;overflow:hidden}
+.wrap{position:relative;z-index:2;max-width:820px;margin:0 auto}
+.clock{font-family:var(--f-display);direction:ltr;text-align:right;font-size:clamp(116px, 36vw, 330px);line-height:.85;letter-spacing:-.03em;color:transparent;-webkit-text-stroke:1.2px var(--blush);margin:4px 0 24px;font-variant-numeric:tabular-nums}
+.market .h2{margin-bottom:22px}
+.mk-photo{margin-top:9svh;aspect-ratio:3/4;max-height:86svh;width:100%;clip-path:inset(14% 10% 14% 10% round 26px)}
+.mk-photo img{transform:scale(1.25)}
+@media (min-width:900px){ .mk-photo{aspect-ratio:16/10} }
+.floaters{position:absolute;inset:0;pointer-events:none;z-index:1}
+.fn{position:absolute;font-size:clamp(28px,7.5vw,48px);color:var(--blush);opacity:.45;white-space:nowrap}
+
+/* ===== הידיים ===== */
+.craft{padding:8svh var(--gutter) 14svh;overflow:hidden}
+.collage{position:relative;height:clamp(460px, 132vw, 900px);margin:6svh 0 5svh}
+.collage figure{position:absolute;box-shadow:0 40px 80px -40px rgba(10,0,3,.9)}
+.c1{right:0;top:0;width:70%;aspect-ratio:3/4}
+.c2{left:0;top:40%;width:50%;aspect-ratio:3/4}
+@media (min-width:900px){ .collage{height:min(78vw, 820px)} .c1{width:52%} .c2{width:40%;left:4%} }
+
+/* ===== שירותים: גלילה לרוחב עם צילומים ===== */
+.services{height:100svh;overflow:hidden}
+.sv-pin{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:calc(66px + env(safe-area-inset-top,0px)) 0 calc(26px + var(--safe-b))}
+.sv-head{padding:0 var(--gutter);margin-bottom:clamp(16px,3svh,34px)}
+.sv-head .h2{font-size:clamp(34px,9vw,76px)}
+.sv-track{display:flex;gap:14px;width:max-content;padding:0 var(--gutter);will-change:transform}
+.card{position:relative;flex:0 0 auto;width:min(76vw, 400px);height:min(62svh, 600px);border-radius:28px;overflow:hidden;color:var(--cream);background:#3a0a14;box-shadow:0 30px 60px -30px rgba(10,0,3,.8)}
+.card img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform 1.2s var(--ease)}
+.card:hover img{transform:scale(1.05)}
+.card::after{content:"";position:absolute;inset:0;background:linear-gradient(to top, rgba(26,3,8,.92) 0%, rgba(26,3,8,.55) 38%, rgba(26,3,8,0) 62%)}
+.card-body{position:absolute;inset-inline:0;bottom:0;z-index:2;padding:22px 22px 22px}
+.card .num{position:absolute;top:18px;right:20px;z-index:2;font-family:var(--f-hand);font-size:28px;color:var(--cream);text-shadow:0 1px 10px rgba(0,0,0,.4)}
+.card h3{font-family:var(--f-display);font-weight:400;font-size:clamp(32px,8.6vw,40px);line-height:1;margin-bottom:8px}
+.card p{font-size:15.5px;line-height:1.6;opacity:.9}
+.ask{margin-top:14px;display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:500;color:var(--wine);background:var(--cream);padding:10px 16px 10px 14px;border-radius:999px;transition:transform .3s var(--ease)}
+.ask:active{transform:scale(.96)}
+.ask svg{width:16px;height:16px}
+.card-end{width:min(56vw, 260px);background:transparent;box-shadow:none;display:flex;align-items:center}
+.card-end::after{display:none}
+.card-end p{font-family:var(--f-hand);font-size:34px;line-height:1.1;color:var(--blush);opacity:1}
+.sv-progress{margin:clamp(16px,3svh,30px) var(--gutter) 0;height:2px;background:rgba(251,241,238,.16);border-radius:2px;overflow:hidden}
+.sv-progress i{display:block;height:100%;background:var(--blush);transform-origin:right;transform:scaleX(0)}
+
+/* ===== הפסקה: דליה ===== */
+.interlude{height:100svh;overflow:hidden;display:grid;place-items:center;text-align:center}
+.il-img{position:absolute;inset:0}
+.il-img img{width:100%;height:100%;object-fit:cover}
+.interlude::after{content:"";position:absolute;inset:0;background:radial-gradient(70% 55% at 50% 50%, rgba(30,3,8,.62), rgba(30,3,8,.15) 70%), linear-gradient(to bottom, rgba(116,23,46,1), rgba(116,23,46,0) 14%, rgba(43,6,16,0) 86%, rgba(43,6,16,1))}
+.il-text{position:relative;z-index:2;padding:0 var(--gutter)}
+.il-text .hand{font-size:clamp(30px,8vw,46px);color:var(--blush);display:block;margin-bottom:6px}
+.il-text h2{font-family:var(--f-display);font-weight:400;font-size:clamp(58px,16vw,150px);line-height:.95;text-shadow:0 4px 40px rgba(20,0,5,.6)}
+.principles{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:26px}
+.principles span{padding:9px 16px;border-radius:999px;border:1px solid rgba(251,241,238,.45);font-size:15px;backdrop-filter:blur(6px);background:rgba(30,3,8,.25)}
+
+/* ===== שבת ===== */
+.shabbat{height:175svh}
+.sh-sticky{position:sticky;top:0;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:clamp(12px,2.4svh,24px);padding:calc(70px + env(safe-area-inset-top,0px)) var(--gutter) calc(22px + var(--safe-b));max-width:1180px;margin:0 auto}
+.sh-photo{width:100%;height:min(32svh, 420px);flex:0 0 auto}
+.sh-photo img{object-position:50% 62%}
+.shabbat .h2{font-size:clamp(38px,10vw,86px)}
+.shabbat .lead{opacity:.82;margin-top:10px}
+.week{position:relative;display:flex;justify-content:space-between;width:min(100%, 420px)}
+.week-line{position:absolute;top:50%;inset-inline:22px;height:2px;background:rgba(116,23,46,.2);transform:translateY(-50%)}
+.week-line i{display:block;height:100%;background:var(--wine);transform-origin:right;transform:scaleX(0)}
+.d{position:relative;z-index:1;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--blush);border:1.5px solid rgba(116,23,46,.35);font-family:var(--f-display);font-size:19px;color:var(--wine)}
+.sh-note{font-size:clamp(28px,7.4vw,40px);color:var(--wine);opacity:0;transform:rotate(-3deg)}
+@media (min-width:900px){
+  .sh-sticky{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:auto auto auto;column-gap:6vw;align-content:center}
+  .sh-photo{grid-column:2;grid-row:1 / span 3;height:min(74svh, 640px)}
+  .sh-text,.week,.sh-note{grid-column:1}
+}
+
+/* ===== תהליך ===== */
+.process{padding:18svh var(--gutter) 14svh}
+.process .h2{margin-bottom:8svh}
+.vine-wrap{position:relative;padding-right:78px}
+.vine{position:absolute;right:0;top:0;width:56px;height:100%;overflow:visible}
+.vine path.track{fill:none;stroke:rgba(116,23,46,.12);stroke-width:2}
+.vine path.grow{fill:none;stroke:var(--wine);stroke-width:2.4;stroke-linecap:round;stroke-dasharray:1 1;stroke-dashoffset:1}
+.steps{list-style:none;display:flex;flex-direction:column;gap:12svh}
+.step{position:relative;opacity:.2;transform:translateY(24px);transition:opacity .9s ease, transform .9s var(--ease)}
+.step.on{opacity:1;transform:none}
+.bubble{position:absolute;right:-84px;top:-8px;width:68px;height:68px;border-radius:50%;overflow:hidden;border:3px solid var(--cream);box-shadow:0 0 0 1.5px var(--wine), 0 14px 30px -12px rgba(74,4,20,.6);transform:scale(.3) rotate(-30deg);transition:transform 1s cubic-bezier(.2,1.5,.4,1)}
+.step.on .bubble{transform:none}
+.bubble img{width:100%;height:100%;object-fit:cover}
+.step .n{font-family:var(--f-hand);font-size:30px;color:var(--wine)}
+.step h3{font-family:var(--f-display);font-weight:400;font-size:clamp(38px,10vw,64px);line-height:1;margin:2px 0 12px;color:var(--burgundy)}
+.step p{font-size:clamp(17px,4.4vw,19px);line-height:1.75;color:var(--mauve);max-width:36ch}
+
+/* ===== סיום ===== */
+.finale{min-height:100svh;overflow:hidden;display:grid;place-items:center;text-align:center;padding:12svh var(--gutter)}
+.fin-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.finale::before{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(48% 40% at 50% 50%, rgba(251,241,238,.92), rgba(251,241,238,.55) 60%, rgba(251,241,238,0) 100%)}
+.fin-in{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;max-width:520px}
+.fin-in .hand{font-size:clamp(32px,8.4vw,46px);color:var(--wine);transform:rotate(-3deg);margin-bottom:4px}
+.fin-in h2{font-family:var(--f-display);font-weight:400;font-size:clamp(50px,13.5vw,100px);line-height:.96;color:var(--burgundy)}
+.fin-in .lead{margin:14px auto 26px;color:var(--ink);opacity:.82;max-width:28ch}
+.btn-wa{display:inline-flex;align-items:center;justify-content:center;gap:12px;min-height:62px;padding:0 30px;border-radius:999px;width:min(100%, 340px);background:var(--wine);color:var(--cream);font-size:18px;font-weight:400;box-shadow:0 18px 40px -16px rgba(116,23,46,.75);transition:translate .35s var(--ease), scale .2s var(--ease), box-shadow .35s}
+.btn-wa svg{width:24px;height:24px}
+.btn-wa:hover{translate:0 -3px}
+.btn-wa:active{scale:.97}
+
+/* סמן פרח במחשב, ופריחה בכל נגיעה בטלפון */
+.flowerimg{width:100%;height:100%;object-fit:cover;-webkit-mask-image:radial-gradient(closest-side,#000 48%,transparent 74%);mask-image:radial-gradient(closest-side,#000 48%,transparent 74%)}
+#cursor{position:fixed;left:0;top:0;width:44px;height:44px;margin:-22px 0 0 -22px;pointer-events:none;z-index:90;display:none;transition:width .35s var(--ease), height .35s var(--ease), margin .35s var(--ease)}
+.cut{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(30,4,8,.35))}
+#cursor .cut{animation:spin 9s linear infinite}
+#cursor::after{content:"";position:absolute;left:50%;top:50%;width:4px;height:4px;margin:-2px 0 0 -2px;border-radius:50%;background:var(--cream);box-shadow:0 0 0 1px rgba(74,4,20,.5)}
+#cursor.big{width:84px;height:84px;margin:-42px 0 0 -42px}
+#cursor.down{width:34px;height:34px;margin:-17px 0 0 -17px}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (hover:hover) and (pointer:fine){
+  html.fx #cursor{display:block}
+  html.fx, html.fx a, html.fx button{cursor:none}
+}
+.tel{margin-top:16px;font-size:17px;color:var(--wine);border-bottom:1px solid rgba(116,23,46,.35);padding-bottom:2px}
+
+footer{padding:56px var(--gutter) calc(110px + var(--safe-b));text-align:center;color:var(--cream)}
+footer .fw{font-family:var(--f-display);font-size:34px}
+footer .fs{margin-top:10px;font-size:15px;opacity:.7;line-height:1.8}
+footer .fc{margin-top:26px;font-size:13px;opacity:.5}
+@media (min-width:900px){ footer{padding-bottom:56px} }
+
+/* בלי תנועה: הכל גלוי ופתוח */
+.rm .pf-open{opacity:1}
+.rm .pf-bud{opacity:0}
+.rm .hl{opacity:1;position:static}
+.rm .brand{opacity:1}
+.rm .mk-photo{clip-path:inset(0 round 26px)}
+.rm .mk-photo img{transform:none}
+.rm .shabbat{height:auto}
+.rm .sh-sticky{position:relative;height:auto;min-height:100svh}
+.rm .sh-note{opacity:1}
+.rm .step{opacity:1;transform:none}
+.rm .bubble{transform:none}
+.rm .vine path.grow{stroke-dashoffset:0}
+.rm .sv-track{overflow-x:auto;width:auto;scroll-snap-type:x mandatory}
+.rm .card{scroll-snap-align:center}
+.rm .fab::after,.rm .scroll-cue i{animation:none}
+</style>
+</head>
+<body>
+
+<div id="backdrop"></div>
+<div class="grain" aria-hidden="true"></div>
+<canvas id="petals" aria-hidden="true"></canvas>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="wa" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2.2a9.8 9.8 0 0 0-8.4 14.8L2.2 21.8l4.9-1.3A9.8 9.8 0 1 0 12 2.2Zm0 17.9a8.1 8.1 0 0 1-4.1-1.1l-.3-.2-2.9.8.8-2.8-.2-.3A8.1 8.1 0 1 1 12 20.1Zm4.4-6c-.2-.1-1.4-.7-1.7-.8-.2-.1-.4-.1-.5.1l-.8 1c-.1.2-.3.2-.5.1a6.6 6.6 0 0 1-3.3-2.9c-.2-.4.2-.4.7-1.3.1-.2 0-.3 0-.4l-.8-1.8c-.2-.5-.4-.4-.5-.4h-.5a.9.9 0 0 0-.7.3 2.9 2.9 0 0 0-.9 2.2c0 1.3.9 2.5 1 2.7.1.2 1.8 2.8 4.4 3.9 1.6.7 2.3.8 3.1.6.5-.1 1.5-.6 1.7-1.2.2-.6.2-1.1.1-1.2 0-.1-.2-.2-.5-.3Z"/></symbol>
+</svg>
+
+<header class="bar" id="bar">
+  <a href="#top" class="brand" id="brand">רבקה דרקסלר</a>
+  <a class="bar-cta" data-wa href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#wa"/></svg>לתיאום בוואטסאפ</a>
+</header>
+<div class="prog" id="prog" aria-hidden="true"><i></i><b></b></div>
+<a class="fab" id="fab" data-wa href="#" aria-label="לכתוב לרבקה בוואטסאפ"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#wa"/></svg></a>
+
+<div id="cursor" aria-hidden="true"><img class="cut" src="img/petals/f3.png" alt=""></div>
+
+<main>
+
+  <!-- פתיחה: ניצן אמיתי בחושך שנפתח לאדמונית -->
+  <section class="hero" id="top" data-bg="#1E0408">
+    <div class="hero-flower-pos">
+      <div id="heroFlowerBox">
+        <img class="pf pf-bud" src="img/peony-bud.jpg" alt="" fetchpriority="high">
+        <img class="pf pf-open" src="img/peony-open.jpg" alt="אדמונית בגוני יין וורוד נפתחת" fetchpriority="high">
+      </div>
+    </div>
+    <div class="hero-title" id="heroTitle">
+      <p class="hand hello">שלום, אני רבקה</p>
+      <h1 class="wordmark"><span>רבקה</span><span>דרקסלר</span></h1>
+      <p class="tagline">סטודיו לעיצוב פרחים · זרים, אירועים ושבת</p>
+    </div>
+    <div class="hero-lines">
+      <p class="hl hand">כל זר מתחיל בשאלה קטנה:</p>
+      <p class="hl display">למי הוא, ולאיזה רגע?</p>
+    </div>
+    <div class="scroll-cue" id="cue"><span class="hand">גללו, זה פורח</span><i></i></div>
+  </section>
+
+  <!-- שפע בורדו -->
+  <section class="abund" id="events" data-bg="#140306">
+    <picture class="ab-pic">
+      <source media="(min-width:900px)" srcset="img/abundance-h.jpg">
+      <img id="abImg" src="img/abundance-v.jpg" alt="מיצב פרחים בגוני בורדו: שולחן עטוף קטיפה, סחלבים, דליות ורימונים" loading="lazy">
+    </picture>
+    <div class="ab-shade"></div>
+    <div class="ab-text" data-reveal>
+      <p class="kicker">עיצוב אירועים</p>
+      <h2 class="h2">כשכל החדר<br>פורח</h2>
+      <p class="lead">קטיפה שנשפכת, סחלבים, דליות ורימונים בין הפרחים, הכל בגוון אחד עמוק. לחתונות, לבר ובת מצווה ולכל ערב שרוצים שיישאר בזיכרון.</p>
+    </div>
+  </section>
+
+  <!-- פרק א: השוק -->
+  <section class="market" id="market" data-bg="#4A0414">
+    <div class="floaters" aria-hidden="true">
+      <span class="fn hand" data-speed="-0.45" style="top:6%;right:6%">אדמוניות</span>
+      <span class="fn hand" data-speed="0.3" style="top:22%;left:4%">ורדי גן</span>
+      <span class="fn hand" data-speed="-0.3" style="top:48%;left:6%">סחלבים</span>
+      <span class="fn hand" data-speed="0.4" style="top:70%;right:8%">ראנונקולוס</span>
+      <span class="fn hand" data-speed="-0.6" style="top:90%;left:26%">אקליפטוס</span>
+    </div>
+    <div class="wrap">
+      <div data-reveal>
+        <p class="kicker">פרק א׳ · השוק</p>
+        <div class="clock" id="clock" aria-label="חמש בבוקר">05:00</div>
+        <h2 class="h2">העיר עוד ישנה.<br>אני כבר בין הדליים.</h2>
+        <p class="lead">אני בוחרת כל פרח בעצמי, לפי העונה ולפי ההזמנה. פרח בעונה שלו הוא היפה והחזק ביותר, ולכן כל זר יוצא קצת אחר, ומגיע אליכם רענן.</p>
+      </div>
+      <figure class="photo mk-photo" id="mkPhoto"><img src="img/market.jpg" alt="דליים מלאים אדמוניות, ורדים ואקליפטוס בשוק הפרחים לפני הזריחה" loading="lazy"></figure>
+    </div>
+  </section>
+
+  <!-- פרק ב: הידיים -->
+  <section class="craft" id="craft" data-bg="#3A0512">
+    <div class="wrap">
+      <div data-reveal>
+        <p class="kicker">פרק ב׳ · הידיים</p>
+        <h2 class="h2">גבעול<br>אחרי גבעול.</h2>
+      </div>
+      <div class="collage">
+        <figure class="photo c1" data-speed="-0.12" data-rot="-2"><img src="img/orchid-hands.jpg" alt="ידיים משלבות סחלב ורוד בין הידרנגאה וחרציות בגוני יין" loading="lazy"></figure>
+        <figure class="photo c2" data-speed="0.18" data-rot="3"><img src="img/hands.jpg" alt="ידיים קושרות זר אדמוניות, ורדים ואקליפטוס" loading="lazy"></figure>
+      </div>
+      <p class="lead" data-reveal>בלי קטלוג ובלי פס ייצור. כל זר וכל סידור נבנים ביד, אחד אחד, עד שהם מרגישים בדיוק שלכם.</p>
+    </div>
+  </section>
+
+  <!-- פרק ג: לכל רגע -->
+  <section class="services" id="services" data-bg="#74172E">
+    <div class="sv-pin">
+      <div class="sv-head">
+        <p class="kicker">פרק ג׳ · לכל רגע</p>
+        <h2 class="h2">מזר קטן לשולחן שבת<br>ועד אולם שלם</h2>
+      </div>
+      <div class="sv-track" id="svTrack">
+        <article class="card"><img src="img/bride.jpg" alt="כלה מחזיקה זר ורדים ואדמוניות בגוני שמנת" loading="lazy"><span class="num">01</span><div class="card-body"><h3>זרי כלה</h3><p>הזר שתחזיקי ביד כל הערב, בהתאמה לשמלה. ואיתו זר ליד ופרחים לבני המשפחה.</p><a class="ask" data-wa="זרי כלה" href="#"><svg viewBox="0 0 24 24"><use href="#wa"/></svg>לשאול על זה</a></div></article>
+        <article class="card"><img src="img/chuppah.jpg" alt="חופה מעוטרת בפרחים בגן בשעת שקיעה" loading="lazy"><span class="num">02</span><div class="card-body"><h3>חופה ואולם</h3><p>חופה, כניסה ובמה באותה שפה, כך שכל האירוע מרגיש כמו מקום אחד.</p><a class="ask" data-wa="עיצוב חופה ואולם" href="#"><svg viewBox="0 0 24 24"><use href="#wa"/></svg>לשאול על זה</a></div></article>
+        <article class="card"><img src="img/event-table.jpg" alt="שולחן אירוע ארוך עם דליות אדומות וורודות ונרות" loading="lazy"><span class="num">03</span><div class="card-body"><h3>מרכזי שולחן</h3><p>לחתונה, לבר ובת מצווה, לשבע ברכות ולכל ערב משפחתי שאוספים אליו את כולם.</p><a class="ask" data-wa="מרכזי שולחן" href="#"><svg viewBox="0 0 24 24"><use href="#wa"/></svg>לשאול על זה</a></div></article>
+        <article class="card"><img src="img/bouquet.jpg" alt="זר אדמוניות, ורדים וכלניות עטוף בנייר שמנת" loading="lazy"><span class="num">04</span><div class="card-body"><h3>פרחים לשבת</h3><p>זר טרי שמגיע לפני שבת וחג. פעם אחת, או כמנוי של כל שבוע.</p><a class="ask" data-wa="פרחים לשבת" href="#"><svg viewBox="0 0 24 24"><use href="#wa"/></svg>לשאול על זה</a></div></article>
+        <article class="card"><img src="img/gift.jpg" alt="זר מתנה עטוף בנייר חום עם כרטיס קטן" loading="lazy"><span class="num">05</span><div class="card-body"><h3>זרים למתנה</h3><p>יום הולדת, לידה, תודה, או סתם כי בא לכם. עם כרטיס בכתב יד.</p><a class="ask" data-wa="זר למתנה" href="#"><svg viewBox="0 0 24 24"><use href="#wa"/></svg>לשאול על זה</a></div></article>
+        <article class="card"><img src="img/lobby.jpg" alt="סידור פרחים גדול באגרטל קרמיקה בלובי" loading="lazy"><span class="num">06</span><div class="card-body"><h3>לבית ולעסק</h3><p>סידורים קבועים ללובי, למשרד ולחנות, שמתחלפים יחד עם העונה.</p><a class="ask" data-wa="סידורי פרחים לבית או לעסק" href="#"><svg viewBox="0 0 24 24"><use href="#wa"/></svg>לשאול על זה</a></div></article>
+        <div class="card card-end"><p>ואם זה משהו אחר לגמרי, ספרו לי. נמציא את זה יחד.</p></div>
+      </div>
+      <div class="sv-progress"><i id="svProg"></i></div>
+    </div>
+  </section>
+
+  <!-- הפסקה: מה שמנחה אותי -->
+  <section class="interlude" id="season" data-bg="#2B0610">
+    <div class="il-img"><img id="ilImg" src="img/dahlia.jpg" alt="דליה אדומה מקרוב" loading="lazy"></div>
+    <div class="il-text" data-reveal>
+      <span class="hand">מה שמנחה אותי</span>
+      <h2>רק מה שפורח<br>עכשיו.</h2>
+      <div class="principles"><span>עונתי</span><span>בעבודת יד</span><span>אישי, אחרי שיחה</span></div>
+    </div>
+  </section>
+
+  <!-- פרק ד: שבת -->
+  <section class="shabbat light" id="shabbat" data-bg="#E8BCB2">
+    <div class="sh-sticky">
+      <figure class="photo sh-photo"><img src="img/shabbat.jpg" alt="שולחן שבת עם פמוטים, חלות ואגרטל אדמוניות" loading="lazy"></figure>
+      <div class="sh-text">
+        <p class="kicker">פרק ד׳ · יום שישי</p>
+        <h2 class="h2">שולחן שבת<br>שכבר מחכה לכם</h2>
+        <p class="lead">בוחרים יום, וזר טרי מגיע לפני שבת. פעם אחת, או כמנוי של כל שבוע.</p>
+      </div>
+      <div class="week" id="week" aria-hidden="true">
+        <div class="week-line"><i id="weekLine"></i></div>
+        <span class="d">א׳</span><span class="d">ב׳</span><span class="d">ג׳</span><span class="d">ד׳</span><span class="d">ה׳</span><span class="d">ו׳</span>
+      </div>
+      <p class="hand sh-note" id="shNote">נקבע לכל יום שישי ✓</p>
+    </div>
+  </section>
+
+  <!-- פרק ה: איך זה עובד -->
+  <section class="process light" id="process" data-bg="#FBF1EE">
+    <div class="wrap">
+      <div data-reveal>
+        <p class="kicker">פרק ה׳ · איך זה עובד</p>
+        <h2 class="h2">שלושה צעדים,<br>מהודעה ועד זר</h2>
+      </div>
+      <div class="vine-wrap" id="vineWrap">
+        <svg class="vine" id="vine" aria-hidden="true"><path class="track"/><path class="grow" pathLength="1"/></svg>
+        <ol class="steps">
+          <li class="step"><span class="bubble"><img src="img/peony-bud.jpg" alt="" loading="lazy"></span><span class="n">01</span><h3>כותבים לי</h3><p>הודעה קצרה בוואטסאפ: מה החגיגה, מתי, איזו אווירה אתם אוהבים ומה התקציב.</p></li>
+          <li class="step"><span class="bubble"><img src="img/centerpiece.jpg" alt="" loading="lazy"></span><span class="n">02</span><h3>אני מציעה</h3><p>אני שולחת הצעה עם צבעים, פרחים וסגנון. משנים יחד עד שזה מרגיש נכון, ורק אז מתחילים.</p></li>
+          <li class="step"><span class="bubble"><img src="img/peony-open.jpg" alt="" loading="lazy"></span><span class="n">03</span><h3>הפרחים מגיעים</h3><p>ביום שנקבע הזר מגיע אליכם או לאולם, טרי ועטוף, עם כמה טיפים שיעזרו לו להחזיק עוד ימים.</p></li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- סיום: חזרה לשאלה מההתחלה -->
+  <section class="finale" id="contact" data-bg="#F3E2DC">
+    <img class="fin-bg" id="finBg" src="img/flatlay.jpg" alt="" loading="lazy">
+    <div class="fin-in" data-reveal>
+      <span class="hand">אז, למי הזר?</span>
+      <h2>נדבר על<br>הפרחים שלכם</h2>
+      <p class="lead">הכי פשוט לכתוב לי בוואטסאפ: מה האירוע, מתי ואיפה. אחזור אליכם עם רעיונות והצעה.</p>
+      <a class="btn-wa" data-wa href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><use href="#wa"/></svg>לכתוב לרבקה בוואטסאפ</a>
+      <a class="tel" href="tel:0526987740">או להתקשר: 052-698-7740</a>
+    </div>
+  </section>
+
+  <footer data-bg="#4A0414">
+    <div class="fw">רבקה דרקסלר</div>
+    <p class="fs">זרי כלה · חופות ואולמות · מרכזי שולחן<br>פרחים לשבת · זרים למתנה · לבית ולעסק</p>
+    <p class="fc">© 2026 רבקה דרקסלר · כל זר בעבודת יד</p>
+  </footer>
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+(() => {
+/* וואטסאפ עם הודעה מוכנה לפי הנושא */
+const PHONE = '972526987740';
+document.querySelectorAll('[data-wa]').forEach(a => {
+  const topic = a.getAttribute('data-wa');
+  const msg = topic ? `היי רבקה, הגעתי מהאתר ואשמח לשמוע על ${topic}` : 'היי רבקה, הגעתי מהאתר ואשמח לשמוע על עיצוב פרחים';
+  a.href = `https://wa.me/${PHONE}?text=${encodeURIComponent(msg)}`;
+  a.target = '_blank'; a.rel = 'noopener';
+});
+
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (reduce || !window.gsap || !window.ScrollTrigger){
+  document.documentElement.classList.add('rm');
+  document.getElementById('fab').classList.add('show');
+  return;
+}
+gsap.registerPlugin(ScrollTrigger);
+ScrollTrigger.config({ ignoreMobileResize:true });
+const H = () => innerHeight;
+
+/* ---------- פתיחה: הניצן נפתח (קצר: גלילה של מסך וחצי) ---------- */
+const htl = gsap.timeline({ scrollTrigger:{ trigger:'.hero', start:'top top', end:() => '+=' + H()*1.6, pin:true, scrub:.7, anticipatePin:1, invalidateOnRefresh:true } });
+htl.to('#heroTitle', {y:() => -H()*.16, opacity:0, duration:.7, ease:'power1.in'}, 0)
+   .to('#cue', {opacity:0, duration:.25}, 0)
+   .to('#brand', {opacity:1, duration:.4}, .5)
+   .fromTo('#heroFlowerBox', {scale:() => innerWidth < 900 ? .46 : .3, y:() => H()*(innerWidth < 900 ? .24 : .22)}, {scale:1, y:() => innerWidth < 900 ? 0 : -H()*.06, duration:1.5, ease:'power2.inOut'}, 0)
+   .fromTo('#heroFlowerBox', {rotation:-14}, {rotation:8, duration:2.8, ease:'none'}, 0)
+   .to('.pf-open', {opacity:1, duration:1, ease:'power1.inOut'}, .35)
+   .fromTo('.pf-bud', {scale:1}, {scale:1.08, duration:1.2}, .2)
+   .fromTo('.pf-open', {scale:.9}, {scale:1, duration:1.3, ease:'power2.out'}, .35)
+   .fromTo('.hl:nth-child(1)', {opacity:0, y:24}, {opacity:1, y:0, duration:.3}, 1.15)
+   .fromTo('.hl:nth-child(2)', {opacity:0, y:24}, {opacity:1, y:0, duration:.3}, 1.45)
+   .to('.hl', {opacity:0, y:-20, duration:.3}, 2.3)
+   .to('#heroFlowerBox', {scale:1.12, duration:.6, ease:'none'}, 2.2);
+/* כשהפתיחה משתחררת, הפרח ממשיך לגדול ולהתעמעם בזמן שתמונת השפע עולה מעליו */
+gsap.to('#heroFlowerBox', {scale:1.5, opacity:.25, ease:'none', scrollTrigger:{trigger:'.abund', start:'top bottom', end:'top top', scrub:true}});
+
+/* ---------- כניסה עדינה לכל בלוק טקסט ---------- */
+gsap.utils.toArray('[data-reveal]').forEach(el => {
+  gsap.from(el.children.length ? el.children : el, {y:44, opacity:0, duration:1.1, ease:'power3.out', stagger:.1,
+    scrollTrigger:{trigger:el, start:'top 82%', toggleActions:'play none none reverse'}});
+});
+
+/* ---------- שפע: התמונה מתקרבת לאט ---------- */
+gsap.fromTo('#abImg', {scale:1.28, yPercent:-4}, {scale:1, yPercent:4, ease:'none', scrollTrigger:{trigger:'.abund', start:'top bottom', end:'bottom top', scrub:true}});
+
+/* ---------- השוק: שעון מתקתק, שמות פרחים צפים, צילום נחשף ---------- */
+const clock = document.getElementById('clock');
+ScrollTrigger.create({ trigger:'.market', start:'top 80%', end:'bottom 30%', onUpdate:s => { clock.textContent = '05:' + String(Math.round(s.progress*47)).padStart(2,'0'); } });
+gsap.utils.toArray('.market [data-speed]').forEach(el => {
+  const sp = parseFloat(el.dataset.speed);
+  gsap.fromTo(el, {y:() => -sp*H()*.5}, {y:() => sp*H()*.5, ease:'none', scrollTrigger:{trigger:'.market', start:'top bottom', end:'bottom top', scrub:true, invalidateOnRefresh:true}});
+});
+gsap.timeline({scrollTrigger:{trigger:'#mkPhoto', start:'top 92%', end:'top 25%', scrub:.6}})
+  .to('#mkPhoto', {clipPath:'inset(0% 0% 0% 0% round 26px)', ease:'none'}, 0)
+  .to('#mkPhoto img', {scale:1, ease:'none'}, 0);
+
+/* ---------- הידיים: קולאז' בשתי מהירויות ---------- */
+gsap.utils.toArray('.collage [data-speed]').forEach(el => {
+  const sp = parseFloat(el.dataset.speed), rot = parseFloat(el.dataset.rot);
+  gsap.fromTo(el, {y:() => -sp*H(), rotation:-rot}, {y:() => sp*H(), rotation:rot, ease:'none', scrollTrigger:{trigger:'.collage', start:'top bottom', end:'bottom top', scrub:true, invalidateOnRefresh:true}});
+  gsap.from(el.querySelector('img'), {scale:1.3, ease:'none', scrollTrigger:{trigger:el, start:'top bottom', end:'center center', scrub:true}});
+});
+
+/* ---------- שירותים: גלילה לרוחב ---------- */
+const track = document.getElementById('svTrack');
+const dist = () => Math.max(0, track.scrollWidth - innerWidth);
+gsap.to(track, {x:() => dist(), ease:'none',
+  scrollTrigger:{ trigger:'.services', start:'top top', end:() => '+=' + dist(), pin:true, scrub:.6, anticipatePin:1, invalidateOnRefresh:true,
+    onUpdate:s => gsap.set('#svProg', {scaleX:s.progress}) }});
+gsap.from('.services .sv-head > *', {y:36, opacity:0, duration:1, ease:'power3.out', stagger:.1, scrollTrigger:{trigger:'.services', start:'top 70%'}});
+
+/* ---------- דליה: מתרחקת ומסתובבת לאט ---------- */
+gsap.fromTo('#ilImg', {scale:1.6, rotation:-10}, {scale:1, rotation:0, ease:'none', scrollTrigger:{trigger:'.interlude', start:'top bottom', end:'bottom top', scrub:true}});
+
+/* ---------- שבת: השבוע עובר עד שישי ---------- */
+const days = gsap.utils.toArray('#week .d');
+const stl = gsap.timeline({ scrollTrigger:{ trigger:'.shabbat', start:'top top', end:'bottom bottom', scrub:.5 } });
+stl.from('.sh-photo img', {scale:1.25, duration:6, ease:'none'}, 0)
+   .to('#weekLine', {scaleX:1, duration:4.6, ease:'none'}, .3);
+days.forEach((d, i) => {
+  const fri = i === days.length - 1, at = .3 + i*(4.6/(days.length-1));
+  stl.to(d, {backgroundColor: fri ? '#74172E' : '#FBF1EE', color: fri ? '#FBF1EE' : '#74172E', scale: fri ? 1.22 : 1.08, duration:.2}, at - .1);
+  if (!fri) stl.to(d, {scale:1, duration:.2}, at + .15);
+});
+stl.fromTo('#shNote', {opacity:0, y:12}, {opacity:1, y:0, duration:.4}, 5.1).to({}, {duration:.5});
+
+/* ---------- תהליך: גבעול שגדל ותמונות שנפתחות ---------- */
+const vine = document.getElementById('vine'), vineWrap = document.getElementById('vineWrap');
+function drawVine(){
+  const h = vineWrap.offsetHeight, w = 56; vine.setAttribute('viewBox', `0 0 ${w} ${h}`);
+  let d = `M${w-22} 0`; const seg = 5;
+  for (let i=1;i<=seg;i++){ const y = h*i/seg, cx = i%2 ? w-4 : w-40; d += ` Q${cx} ${(y - h/seg/2).toFixed(1)} ${w-22} ${y.toFixed(1)}`; }
+  vine.querySelectorAll('path').forEach(p => p.setAttribute('d', d));
+}
+drawVine(); ScrollTrigger.addEventListener('refreshInit', drawVine);
+gsap.to('#vine .grow', {strokeDashoffset:0, ease:'none', scrollTrigger:{trigger:'#vineWrap', start:'top 72%', end:'bottom 60%', scrub:.5}});
+gsap.utils.toArray('.step').forEach(st => ScrollTrigger.create({ trigger:st, start:'top 74%', onEnter:() => st.classList.add('on'), onLeaveBack:() => st.classList.remove('on') }));
+
+/* ---------- סיום ---------- */
+gsap.fromTo('#finBg', {scale:1.18}, {scale:1, ease:'none', scrollTrigger:{trigger:'.finale', start:'top bottom', end:'bottom bottom', scrub:true}});
+
+/* ---------- צבע הרקע זורם בין הפרקים ---------- */
+const backdrop = document.getElementById('backdrop'), bar = document.getElementById('bar'), prog = document.getElementById('prog'), fab = document.getElementById('fab');
+const secs = gsap.utils.toArray('[data-bg]');
+const outer = el => (el.parentElement && el.parentElement.classList.contains('pin-spacer')) ? el.parentElement : el;
+const lum = hex => { const n = parseInt(hex.slice(1),16); return ((n>>16)*.299 + ((n>>8)&255)*.587 + (n&255)*.114)/255; };
+let lightNow = null, petalsLight = false, vel = 0;
+function paint(){
+  const vh = H(), mid = vh*.5, zone = vh*.45;
+  let color = secs[0].dataset.bg, topSec = secs[0];
+  for (let i=0;i<secs.length;i++){
+    const r = outer(secs[i]).getBoundingClientRect();
+    if (r.top <= 60 && r.bottom > 60) topSec = secs[i];
+    if (r.top <= mid && r.bottom > mid){
+      color = secs[i].dataset.bg;
+      const nx = secs[i+1];
+      if (nx){ const nr = outer(nx).getBoundingClientRect(); const t = gsap.utils.clamp(0,1,(mid + zone - nr.top)/zone); if (t > 0) color = gsap.utils.interpolate(secs[i].dataset.bg, nx.dataset.bg, t); }
+    }
+  }
+  backdrop.style.background = color;
+  const light = lum(topSec.dataset.bg) > .6;
+  if (light !== lightNow){ lightNow = light; [bar, prog, fab].forEach(e => e.classList.toggle('on-light', light)); petalsLight = light; }
+  const p = scrollY / Math.max(1, document.documentElement.scrollHeight - vh);
+  prog.querySelector('i').style.transform = `scaleY(${p})`;
+  prog.querySelector('b').style.top = (p*100) + '%';
+  const fin = document.querySelector('.finale').getBoundingClientRect();
+  fab.classList.toggle('show', scrollY > vh*2 && fin.top > vh*.7);
+  bar.classList.toggle('scrolled', scrollY > vh*.5);
+}
+ScrollTrigger.create({ start:0, end:'max', onUpdate:s => { paint(); vel = s.getVelocity(); } });
+ScrollTrigger.addEventListener('refresh', paint);
+
+/* ---------- עלי כותרת: נושרים, נערמים למטה, ועפים מנגיעה ---------- */
+const cv = document.getElementById('petals'), ctx = cv.getContext('2d');
+let W = 0, Hh = 0, P = [], fly = [], landed = [], heights = [];
+// הערימה מצוירת על משטח נפרד ומתעדכנת רק כשמשהו בה משתנה
+const pileCv = document.createElement('canvas'), pctx = pileCv.getContext('2d');
+let pileDirty = true;
+const DPR = Math.min(devicePixelRatio || 1, 2), BIN = 8;
+const small = () => innerWidth < 700;
+const N = () => small() ? 13 : 24;
+const MAXL = () => small() ? 80 : 150;          // כמה עלים בערימה לכל היותר
+const PILE = () => small() ? 24 : 32;           // גובה הערימה המקסימלי
+// עלי כותרת ופרחים קטנים אמיתיים, גזורים מצילום
+const loadSet = (pre, n) => Array.from({length:n}, (_, i) => { const im = new Image(); im.src = `img/petals/${pre}${i}.png`; return im; });
+const PETALS = loadSet('p', 16), BLOOMS = loadSet('f', 16);
+const rand = (a,b) => a + Math.random()*(b-a);
+const pick = arr => arr[(Math.random()*arr.length)|0];
+function mk(init){ const f = Math.random() < .12; return { x:rand(0,W), y:init?rand(0,Hh*.8):rand(-60,-20), s:f ? rand(9,13) : rand(8,14), img:f ? pick(BLOOMS) : pick(PETALS), f, vy:rand(.35,.85), vx:rand(-.35,.35), r:rand(0,6.28), vr:rand(-.02,.02), ph:rand(0,6.28), vp:rand(.02,.05), a:rand(.85,1) }; }
+function size(){
+  if (innerWidth === W && Math.abs(innerHeight - Hh) < 120) return;
+  const wChanged = innerWidth !== W;
+  W = innerWidth; Hh = innerHeight; cv.width = W*DPR; cv.height = Hh*DPR; cv.style.width = W+'px'; cv.style.height = Hh+'px'; ctx.setTransform(DPR,0,0,DPR,0,0);
+  P = Array.from({length:N()}, () => mk(true));
+  if (wChanged){ heights = new Array(Math.ceil(W/BIN)+3).fill(0); landed = []; }
+  pileDirty = true;
+}
+size(); addEventListener('resize', size);
+
+const binOf = x => gsap.utils.clamp(0, heights.length-1, Math.round(x/BIN));
+function land(p){
+  const b = binOf(p.x), top = Hh - heights[b];
+  landed.push({ x:p.x, y:top - p.s*.2 + rand(-1.5,1.5), r:rand(0,6.28), s:p.s, img:p.img, f:p.f, a:1, flat:p.f ? rand(.72,.88) : rand(.5,.72), b, life:1, dying:false });
+  for (let k=-2;k<=2;k++){ const i = b+k; if (i>=0 && i<heights.length) heights[i] = Math.min(PILE(), heights[i] + p.s*.2*(1 - Math.abs(k)*.3)); }
+  pileDirty = true;
+  const alive = landed.filter(l => !l.dying);
+  if (alive.length > MAXL()) alive[0].dying = true;
+}
+function burst(x, y, n, power=1){
+  for (let i=0;i<n;i++){ const ang = rand(-Math.PI*.95, -Math.PI*.05), sp = rand(2.2, 5.2)*power;
+    const f = Math.random() < .6;   // רוב מה שעף מנגיעה הם פרחים קטנים, השאר עלי כותרת
+    fly.push({ x, y, vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp, s:f ? rand(10,17) : rand(8,13), img:f ? pick(BLOOMS) : pick(PETALS), f, r:rand(0,6.28), vr:rand(-.12,.12), ph:rand(0,6.28), vp:rand(.05,.1), a:1 }); }
+}
+// נגיעה בערימה: העלים הקרובים עפים שוב לאוויר
+function scatter(x, radius){
+  landed.forEach(l => { if (!l.dying && Math.abs(l.x - x) < radius){
+    l.dying = true; l.life = 0;
+    fly.push({ x:l.x, y:l.y, vx:rand(-2.5,2.5) + (l.x - x)*.04, vy:rand(-7,-4), s:l.s, r:l.r, vr:rand(-.15,.15), ph:rand(0,6.28), vp:rand(.05,.1), img:l.img, f:l.f, a:1 });
+    for (let k=-2;k<=2;k++){ const i = l.b+k; if (i>=0 && i<heights.length) heights[i] = Math.max(0, heights[i] - l.s*.2*(1 - Math.abs(k)*.3)); }
+  }});
+}
+function drawPetal(p, flip, flat, c = ctx){
+  const ctx = c;
+  const im = p.img; if (!im || !im.complete || !im.naturalWidth) return;
+  if (p.f && !flat) flip = .72 + flip*.28;   // פרח שלם מתנדנד פחות מעלה כותרת
+  ctx.save(); ctx.translate(p.x, p.y);
+  if (flat){ ctx.scale(1, flat); ctx.rotate(p.r); } else { ctx.rotate(p.r); ctx.scale(1, flip); }
+  const k = (p.s*2) / Math.max(im.naturalWidth, im.naturalHeight), w = im.naturalWidth*k, h = im.naturalHeight*k;
+  ctx.globalAlpha = p.a * (p.life === undefined ? 1 : p.life);
+  ctx.drawImage(im, -w/2, -h/2, w, h);
+  ctx.restore();
+}
+let running = true;
+document.addEventListener('visibilitychange', () => { running = !document.hidden; if (running) requestAnimationFrame(loop); });
+function loop(){
+  if (!running) return;
+  ctx.clearRect(0,0,W,Hh);
+  const push = gsap.utils.clamp(-6, 6, vel/900); vel *= .92;
+  // גלילה חזקה מעיפה קצת מהערימה
+  if (Math.abs(push) > 3.5 && landed.length && Math.random() < .5) scatter(rand(0,W), 26);
+  // ערימה: קודם הישנים, כך שהחדשים נחים מעליהם
+  for (let i=landed.length-1;i>=0;i--){ const l = landed[i]; if (l.dying){ pileDirty = true; l.life -= .03; if (l.life <= 0){ landed.splice(i,1); continue; } } }
+  if (pileDirty){
+    if (pileCv.width !== cv.width || pileCv.height !== cv.height){ pileCv.width = cv.width; pileCv.height = cv.height; }
+    pctx.setTransform(DPR,0,0,DPR,0,0); pctx.clearRect(0,0,W,Hh);
+    for (const l of landed) drawPetal(l, 1, l.flat, pctx);
+    pileDirty = false;
+  }
+  if (landed.length){ ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.drawImage(pileCv, 0, 0); ctx.restore(); }
+  // עלים שנושרים
+  for (const p of P){
+    p.ph += p.vp; p.r += p.vr; p.y += p.vy - push; p.x += p.vx + Math.sin(p.ph)*.5;
+    if (p.x < -40 || p.x > W + 40 || p.y < -80){ Object.assign(p, mk(false), push < 0 ? {y:Hh-PILE()-10} : {}); continue; }
+    if (push > -1 && p.y >= Hh - heights[binOf(p.x)] - p.s*.2){ land(p); Object.assign(p, mk(false)); continue; }
+    drawPetal(p, .3 + Math.abs(Math.sin(p.ph))*.7);
+  }
+  // עלים שעפו מנגיעה: כבידה ואז ריחוף
+  for (let i=fly.length-1;i>=0;i--){
+    const p = fly[i];
+    p.vy = Math.min(p.vy + .14, 1.4); p.vx *= .985; p.ph += p.vp; p.r += p.vr;
+    p.x += p.vx + (p.vy > 0 ? Math.sin(p.ph)*.6 : 0); p.y += p.vy - push*.6;
+    if (p.x < -40 || p.x > W + 40 || p.y < -200){ fly.splice(i,1); continue; }
+    if (p.vy > 0 && p.y >= Hh - heights[binOf(p.x)] - p.s*.2){ land(p); fly.splice(i,1); continue; }
+    drawPetal(p, .3 + Math.abs(Math.sin(p.ph))*.7);
+  }
+  requestAnimationFrame(loop);
+}
+requestAnimationFrame(loop);
+
+/* ---------- סמן פרח במחשב, פריחה בכל נגיעה בטלפון ---------- */
+const cursor = document.getElementById('cursor');
+const fine = matchMedia('(hover:hover) and (pointer:fine)').matches;
+if (fine){
+  document.documentElement.classList.add('fx');
+  let mx = -100, my = -100, cx = -100, cy = -100, lastTrail = 0;
+  addEventListener('pointermove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.classList.toggle('big', !!e.target.closest('a, button, .card'));
+    const now = performance.now();
+    if (now - lastTrail > 90 && Math.hypot(e.movementX, e.movementY) > 6){ lastTrail = now; burst(mx, my, 1, .35); }
+  }, {passive:true});
+  addEventListener('pointerdown', e => { cursor.classList.add('down'); burst(e.clientX, e.clientY, 7); if (e.clientY > Hh - 70) scatter(e.clientX, 70); });
+  addEventListener('pointerup', () => cursor.classList.remove('down'));
+  document.addEventListener('mouseleave', () => { mx = my = -100; });
+  gsap.ticker.add(() => { cx += (mx - cx)*.22; cy += (my - cy)*.22; cursor.style.transform = `translate3d(${cx}px,${cy}px,0)`; });
+} else {
+  // כל נגיעה, גם בתחילת גלילה, משפריצה פרחים קטנים ועלי כותרת
+  addEventListener('pointerdown', e => {
+    const x = e.clientX, y = e.clientY;
+    burst(x, y, 7);
+    if (y > Hh - 80) scatter(x, 80);
+  }, {passive:true});
+}
+
+/* תמונות שנטענות מאוחר משנות גבהים, אז מרעננים מיקומים */
+let rt; const refresh = () => { clearTimeout(rt); rt = setTimeout(() => ScrollTrigger.refresh(), 150); };
+document.querySelectorAll('img').forEach(im => { if (!im.complete) im.addEventListener('load', refresh, {once:true}); });
+document.fonts && document.fonts.ready.then(refresh);
+paint();
+})();
+</script>
+</body>
+</html>
