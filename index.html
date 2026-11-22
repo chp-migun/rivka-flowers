@@ -125,27 +125,27 @@ section{position:relative}
 @keyframes drip{0%{transform:scaleY(0);opacity:1}60%{transform:scaleY(1);opacity:1}100%{transform:scaleY(1);opacity:0}}
 
 /* ===== שפע: מיצב בורדו ===== */
-.abund{min-height:118svh;overflow:hidden;display:flex;align-items:flex-end}
+.abund{min-height:100svh;overflow:hidden;display:flex;align-items:flex-end;margin-top:-24svh;z-index:3;border-radius:30px 30px 0 0;box-shadow:0 -30px 60px -20px rgba(10,0,3,.8)}
 .ab-pic{position:absolute;inset:0}
 .ab-pic img{width:100%;height:100%;object-fit:cover;transform-origin:50% 60%}
-.ab-shade{position:absolute;inset:0;background:linear-gradient(to top, rgba(18,3,6,.96) 0%, rgba(18,3,6,.75) 32%, rgba(18,3,6,0) 62%), linear-gradient(to bottom, rgba(30,4,8,1) 0%, rgba(30,4,8,0) 18%)}
-.ab-text{position:relative;padding:0 var(--gutter) calc(14svh + var(--safe-b));max-width:760px}
+.ab-shade{position:absolute;inset:0;background:linear-gradient(to top, rgba(18,3,6,.96) 0%, rgba(18,3,6,.72) 34%, rgba(18,3,6,0) 60%)}
+.ab-text{position:relative;padding:0 var(--gutter) calc(8svh + var(--safe-b));max-width:760px}
 .ab-text .lead{margin-top:16px}
 
 /* ===== השוק ===== */
-.market{padding:12svh var(--gutter) 16svh;overflow:hidden}
+.market{padding:9svh var(--gutter) 10svh;overflow:hidden}
 .wrap{position:relative;z-index:2;max-width:820px;margin:0 auto}
 .clock{font-family:var(--f-display);direction:ltr;text-align:right;font-size:clamp(116px, 36vw, 330px);line-height:.85;letter-spacing:-.03em;color:transparent;-webkit-text-stroke:1.2px var(--blush);margin:4px 0 24px;font-variant-numeric:tabular-nums}
 .market .h2{margin-bottom:22px}
-.mk-photo{margin-top:9svh;aspect-ratio:3/4;max-height:86svh;width:100%;clip-path:inset(14% 10% 14% 10% round 26px)}
+.mk-photo{margin-top:5svh;aspect-ratio:3/4;max-height:86svh;width:100%;clip-path:inset(14% 10% 14% 10% round 26px)}
 .mk-photo img{transform:scale(1.25)}
 @media (min-width:900px){ .mk-photo{aspect-ratio:16/10} }
 .floaters{position:absolute;inset:0;pointer-events:none;z-index:1}
 .fn{position:absolute;font-size:clamp(28px,7.5vw,48px);color:var(--blush);opacity:.45;white-space:nowrap}
 
 /* ===== הידיים ===== */
-.craft{padding:8svh var(--gutter) 14svh;overflow:hidden}
-.collage{position:relative;height:clamp(460px, 132vw, 900px);margin:6svh 0 5svh}
+.craft{padding:4svh var(--gutter) 10svh;overflow:hidden}
+.collage{position:relative;height:clamp(440px, 124vw, 860px);margin:4svh 0 3svh}
 .collage figure{position:absolute;box-shadow:0 40px 80px -40px rgba(10,0,3,.9)}
 .c1{right:0;top:0;width:70%;aspect-ratio:3/4}
 .c2{left:0;top:40%;width:50%;aspect-ratio:3/4}
@@ -186,7 +186,7 @@ section{position:relative}
 .principles span{padding:9px 16px;border-radius:999px;border:1px solid rgba(251,241,238,.45);font-size:15px;backdrop-filter:blur(6px);background:rgba(30,3,8,.25)}
 
 /* ===== שבת ===== */
-.shabbat{height:175svh}
+.shabbat{height:145svh}
 .sh-sticky{position:sticky;top:0;height:100svh;overflow:hidden;display:flex;flex-direction:column;justify-content:center;gap:clamp(12px,2.4svh,24px);padding:calc(70px + env(safe-area-inset-top,0px)) var(--gutter) calc(22px + var(--safe-b));max-width:1180px;margin:0 auto}
 .sh-photo{width:100%;height:min(32svh, 420px);flex:0 0 auto}
 .sh-photo img{object-position:50% 62%}
@@ -204,13 +204,13 @@ section{position:relative}
 }
 
 /* ===== תהליך ===== */
-.process{padding:18svh var(--gutter) 14svh}
-.process .h2{margin-bottom:8svh}
+.process{padding:10svh var(--gutter) 10svh}
+.process .h2{margin-bottom:5svh}
 .vine-wrap{position:relative;padding-right:78px}
 .vine{position:absolute;right:0;top:0;width:56px;height:100%;overflow:visible}
 .vine path.track{fill:none;stroke:rgba(116,23,46,.12);stroke-width:2}
 .vine path.grow{fill:none;stroke:var(--wine);stroke-width:2.4;stroke-linecap:round;stroke-dasharray:1 1;stroke-dashoffset:1}
-.steps{list-style:none;display:flex;flex-direction:column;gap:12svh}
+.steps{list-style:none;display:flex;flex-direction:column;gap:7svh}
 .step{position:relative;opacity:.2;transform:translateY(24px);transition:opacity .9s ease, transform .9s var(--ease)}
 .step.on{opacity:1;transform:none}
 .bubble{position:absolute;right:-84px;top:-8px;width:68px;height:68px;border-radius:50%;overflow:hidden;border:3px solid var(--cream);box-shadow:0 0 0 1.5px var(--wine), 0 14px 30px -12px rgba(74,4,20,.6);transform:scale(.3) rotate(-30deg);transition:transform 1s cubic-bezier(.2,1.5,.4,1)}
@@ -474,21 +474,18 @@ ScrollTrigger.config({ ignoreMobileResize:true });
 const H = () => innerHeight;
 
 /* ---------- פתיחה: הניצן נפתח (קצר: גלילה של מסך וחצי) ---------- */
-const htl = gsap.timeline({ scrollTrigger:{ trigger:'.hero', start:'top top', end:() => '+=' + H()*1.6, pin:true, scrub:.7, anticipatePin:1, invalidateOnRefresh:true } });
+const htl = gsap.timeline({ scrollTrigger:{ trigger:'.hero', start:'top top', end:() => '+=' + H()*1.05, pin:true, scrub:.6, anticipatePin:1, invalidateOnRefresh:true } });
 htl.to('#heroTitle', {y:() => -H()*.16, opacity:0, duration:.7, ease:'power1.in'}, 0)
    .to('#cue', {opacity:0, duration:.25}, 0)
    .to('#brand', {opacity:1, duration:.4}, .5)
    .fromTo('#heroFlowerBox', {scale:() => innerWidth < 900 ? .46 : .3, y:() => H()*(innerWidth < 900 ? .24 : .22)}, {scale:1, y:() => innerWidth < 900 ? 0 : -H()*.06, duration:1.5, ease:'power2.inOut'}, 0)
-   .fromTo('#heroFlowerBox', {rotation:-14}, {rotation:8, duration:2.8, ease:'none'}, 0)
+   .fromTo('#heroFlowerBox', {rotation:-14}, {rotation:8, duration:1.6, ease:'none'}, 0)
    .to('.pf-open', {opacity:1, duration:1, ease:'power1.inOut'}, .35)
    .fromTo('.pf-bud', {scale:1}, {scale:1.08, duration:1.2}, .2)
    .fromTo('.pf-open', {scale:.9}, {scale:1, duration:1.3, ease:'power2.out'}, .35)
-   .fromTo('.hl:nth-child(1)', {opacity:0, y:24}, {opacity:1, y:0, duration:.3}, 1.15)
-   .fromTo('.hl:nth-child(2)', {opacity:0, y:24}, {opacity:1, y:0, duration:.3}, 1.45)
-   .to('.hl', {opacity:0, y:-20, duration:.3}, 2.3)
-   .to('#heroFlowerBox', {scale:1.12, duration:.6, ease:'none'}, 2.2);
-/* כשהפתיחה משתחררת, הפרח ממשיך לגדול ולהתעמעם בזמן שתמונת השפע עולה מעליו */
-gsap.to('#heroFlowerBox', {scale:1.5, opacity:.25, ease:'none', scrollTrigger:{trigger:'.abund', start:'top bottom', end:'top top', scrub:true}});
+   .fromTo('.hl:nth-child(1)', {opacity:0, y:24}, {opacity:1, y:0, duration:.3}, .7)
+   .fromTo('.hl:nth-child(2)', {opacity:0, y:24}, {opacity:1, y:0, duration:.3}, .85);
+/* תמונת השפע עולה מעל הפתיחה כמו כרטיס, בלי מסך ריק ביניהן */
 
 /* ---------- כניסה עדינה לכל בלוק טקסט ---------- */
 gsap.utils.toArray('[data-reveal]').forEach(el => {
@@ -497,7 +494,7 @@ gsap.utils.toArray('[data-reveal]').forEach(el => {
 });
 
 /* ---------- שפע: התמונה מתקרבת לאט ---------- */
-gsap.fromTo('#abImg', {scale:1.28, yPercent:-4}, {scale:1, yPercent:4, ease:'none', scrollTrigger:{trigger:'.abund', start:'top bottom', end:'bottom top', scrub:true}});
+gsap.fromTo('#abImg', {scale:1.18}, {scale:1, ease:'none', scrollTrigger:{trigger:'.abund', start:'top bottom', end:'bottom top', scrub:true}});
 
 /* ---------- השוק: שעון מתקתק, שמות פרחים צפים, צילום נחשף ---------- */
 const clock = document.getElementById('clock');
