@@ -106,16 +106,16 @@ section{position:relative}
   -webkit-mask-image:radial-gradient(closest-side, #000 58%, transparent 99%);mask-image:radial-gradient(closest-side, #000 58%, transparent 99%)}
 .pf-open{opacity:0}
 @media (min-width:900px){
-  #heroFlowerBox{width:min(84svh, 860px)}
+  #heroFlowerBox{width:min(74svh, 760px)}
   .hero-title{padding-bottom:34svh}
-  .hero-lines{bottom:calc(6svh + var(--safe-b))}
+  .hero-lines{top:7svh}
 }
 .hero-title{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 var(--gutter) 30svh;text-shadow:0 2px 30px rgba(20,0,5,.5)}
 .hello{font-size:clamp(30px,8.5vw,46px);color:var(--blush);margin-bottom:6px;transform:rotate(-3deg)}
 .wordmark{font-family:var(--f-display);font-weight:400;font-size:clamp(80px, 25vw, 210px);line-height:.86;letter-spacing:-.02em;display:flex;flex-direction:column;align-items:center}
 .wordmark span:nth-child(2){color:var(--blush);margin-top:.04em}
 .tagline{margin-top:20px;font-size:clamp(14px,3.8vw,17px);letter-spacing:.04em;opacity:.8}
-.hero-lines{position:absolute;inset-inline:0;bottom:calc(11svh + var(--safe-b));display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 var(--gutter);pointer-events:none;text-shadow:0 2px 24px rgba(20,0,5,.85)}
+.hero-lines{position:absolute;inset-inline:0;top:calc(9svh + env(safe-area-inset-top,0px));display:flex;flex-direction:column;align-items:center;gap:4px;padding:0 var(--gutter);pointer-events:none;text-shadow:0 2px 24px rgba(20,0,5,.85)}
 .hl{text-align:center;opacity:0}
 .hl.hand{font-size:clamp(34px,9.5vw,60px);color:var(--blush);line-height:1.05}
 .hl.display{font-size:clamp(46px,13vw,110px);line-height:1;letter-spacing:-.01em;text-wrap:balance}
@@ -504,7 +504,7 @@ const htl = gsap.timeline({ scrollTrigger:{ trigger:'.hero', start:'top top', en
 htl.to('#heroTitle', {y:() => -H()*.16, opacity:0, duration:.7, ease:'power1.in'}, 0)
    .to('#cue', {opacity:0, duration:.25}, 0)
    .to('#brand', {opacity:1, duration:.4}, .5)
-   .fromTo('#heroFlowerBox', {scale:() => innerWidth < 900 ? .46 : .3, y:() => H()*(innerWidth < 900 ? .24 : .22)}, {scale:1, y:() => innerWidth < 900 ? 0 : -H()*.06, duration:1.5, ease:'power2.inOut'}, 0)
+   .fromTo('#heroFlowerBox', {scale:() => innerWidth < 900 ? .46 : .3, y:() => H()*(innerWidth < 900 ? .24 : .22)}, {scale:1, y:() => H()*(innerWidth < 900 ? .09 : .12), duration:1.5, ease:'power2.inOut'}, 0)
    .fromTo('#heroFlowerBox', {rotation:-14}, {rotation:8, duration:1.6, ease:'none'}, 0)
    .to('.pf-open', {opacity:1, duration:1, ease:'power1.inOut'}, .35)
    .fromTo('.pf-bud', {scale:1}, {scale:1.08, duration:1.2}, .2)
