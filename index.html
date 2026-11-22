@@ -582,7 +582,8 @@ const track = document.getElementById('svTrack');
 const dist = () => Math.max(0, track.scrollWidth - innerWidth);
 const svBtns = document.querySelectorAll('.sv-btn');
 const svTween = gsap.to(track, {x:() => dist(), ease:'none',
-  scrollTrigger:{ trigger:'.services', start:'top top', end:() => '+=' + dist(), pin:true, scrub:.6, anticipatePin:1, invalidateOnRefresh:true,
+  // בטלפון בלי שום השהיה: הכרטיסים צמודים לאצבע. במחשב החלקה קצרצרה לגלגלת
+  scrollTrigger:{ trigger:'.services', start:'top top', end:() => '+=' + dist(), pin:true, scrub:matchMedia('(pointer:coarse)').matches ? true : .15, anticipatePin:1, invalidateOnRefresh:true,
     onUpdate:s => { gsap.set('#svProg', {scaleX:s.progress}); svBtns[0].disabled = s.progress < .01; svBtns[1].disabled = s.progress > .99; } }});
 svBtns[0].disabled = true;
 
@@ -591,25 +592,30 @@ svBtns[0].disabled = true;
 const svSec = document.querySelector('.services');
 const svClampTo = y => { const st = svTween.scrollTrigger; return gsap.utils.clamp(st.start, st.end, y); };
 const svMove = d => window.scrollTo(0, svClampTo(scrollY + d));
+const SV_GAIN = 1.5;   // החלקה לרוחב מזיזה יותר מהמרחק של האצבע, כדי שיהיה מהיר
 let sx = 0, sy = 0, lastX = 0, lastT = 0, vX = 0, lock = null, momId = 0;
-svSec.addEventListener('touchstart', e => { const t = e.touches[0]; sx = lastX = t.clientX; sy = t.clientY; lastT = performance.now(); lock = null; vX = 0; cancelAnimationFrame(momId); }, {passive:true});
+const svStop = () => { cancelAnimationFrame(momId); momId = 0; };
+svSec.addEventListener('touchstart', e => { const t = e.touches[0]; sx = lastX = t.clientX; sy = t.clientY; lastT = performance.now(); lock = null; vX = 0; svStop(); }, {passive:true});
 svSec.addEventListener('touchmove', e => {
   const t = e.touches[0], dx = t.clientX - sx, dy = t.clientY - sy;
-  if (lock === null && Math.hypot(dx, dy) > 8) lock = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+  // מספיקה תנועה קטנה כדי להחליט; נטייה קלה לצדדים כבר נחשבת גלילה לרוחב
+  if (lock === null && Math.hypot(dx, dy) > 6) lock = Math.abs(dx) > Math.abs(dy)*.75 ? 'x' : 'y';
   if (lock !== 'x') return;
   e.preventDefault();
-  const d = t.clientX - lastX, now = performance.now();
-  vX = d / Math.max(1, now - lastT) * 16; lastT = now; lastX = t.clientX;
+  const d = (t.clientX - lastX) * SV_GAIN, now = performance.now(), dt = Math.max(1, now - lastT);
+  vX = vX*.4 + (d / dt * 16)*.6; lastT = now; lastX = t.clientX;   // מהירות מוחלקת, לתנופה אחרי השחרור
   svMove(d);   // האצבע ימינה = הכרטיסים זזים ימינה = הכרטיס הבא נחשף
 }, {passive:false});
 svSec.addEventListener('touchend', () => {
   if (lock !== 'x') return;
-  let v = vX; const step = () => { v *= .93; if (Math.abs(v) < .4) return; svMove(v); momId = requestAnimationFrame(step); };
+  if (performance.now() - lastT > 90) vX = 0;   // האצבע עצרה לפני השחרור: בלי תנופה
+  // תנופה חופשית: ממשיך להחליק ודועך לאט, עד שנגיעה חדשה עוצרת
+  let v = vX * 1.15; const step = () => { v *= .955; if (Math.abs(v) < .3){ momId = 0; return; } svMove(v); momId = requestAnimationFrame(step); };
   momId = requestAnimationFrame(step);
 }, {passive:true});
 svSec.addEventListener('wheel', e => {
   if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return;
-  e.preventDefault(); svMove(-e.deltaX);
+  e.preventDefault(); svStop(); svMove(-e.deltaX * SV_GAIN);
 }, {passive:false});
 svBtns.forEach(b => b.addEventListener('click', () => {
   const card = track.querySelector('.card'), stepPx = card.offsetWidth + 14;
@@ -704,12 +710,21 @@ function size(){
   if (first || wChanged){
     P = Array.from({length:N()}, () => mk(true));
     heights = new Array(Math.ceil(W/BIN)+3).fill(0); landed = [];
+  } else if (dH > 6){
+    // המסך התארך (באייפון הסרגל של הדפדפן נעלם): הערימה מתפרקת וכל עלה נושר מחדש
+    // כמו עלה אמיתי — כל אחד ברגע אחר, מתנדנד, מסתובב ומתהפך, ונערם מחדש בתחתית
+    landed.forEach(l => { if (l.dying) return;
+      const fl = l.flat || .6;
+      fly.push({ x:l.x, y:l.y, vx:rand(-.5,.5), vy:rand(-.4,.2), wait:(rand(0, 26))|0, flat:fl,
+        vmax:rand(1.3, 2.3), sway:rand(.7, 1.4), s:l.s, r:l.r, vr:rand(-.035,.035),
+        ph:Math.asin(gsap.utils.clamp(0, 1, (fl - .3)/.7)), vp:rand(.05,.09), img:l.img, f:l.f, a:1, leaf:true });
+    });
+    landed = []; heights.fill(0);
   } else if (dH > 0){
-    // המסך התארך (באייפון הסרגל של הדפדפן נעלם): הערימה נופלת לתחתית החדשה
-    landed.forEach(l => { l.fallTo = (l.fallTo ?? l.y) + dH; l.fv = l.fv || rand(0, 1.5); });
+    landed.forEach(l => { l.y += dH; });     // שינוי זעיר: הערימה פשוט יורדת איתו
   } else if (dH < 0){
     // המסך התקצר: הערימה עולה איתו, כדי שלא תיעלם מתחת לשולי המסך
-    landed.forEach(l => { l.y += dH; if (l.fallTo !== undefined) l.fallTo += dH; });
+    landed.forEach(l => { l.y += dH; });
   }
   pileDirty = true;
 }
@@ -759,13 +774,6 @@ function loop(){
   if (Math.abs(push) > 4.5 && landed.length && Math.random() < .2) scatter(rand(0,W), 22);
   // ערימה: קודם הישנים, כך שהחדשים נחים מעליהם
   for (let i=landed.length-1;i>=0;i--){ const l = landed[i]; if (l.dying){ pileDirty = true; l.life -= .03; if (l.life <= 0){ landed.splice(i,1); continue; } } }
-  // עלים בערימה שצריכים ליפול לתחתית חדשה: כבידה, וקפיצה קטנה בנחיתה
-  for (const l of landed){
-    if (l.fallTo === undefined) continue;
-    pileDirty = true;
-    l.fv += .55; l.y += l.fv; l.r += l.fv*.004;
-    if (l.y >= l.fallTo){ l.y = l.fallTo; if (l.fv > 2.5) l.fv = -l.fv*.28; else { delete l.fallTo; l.fv = 0; } }
-  }
   if (pileDirty){
     if (pileCv.width !== cv.width || pileCv.height !== cv.height){ pileCv.width = cv.width; pileCv.height = cv.height; }
     pctx.setTransform(DPR,0,0,DPR,0,0); pctx.clearRect(0,0,W,Hh);
@@ -783,6 +791,19 @@ function loop(){
   // עלים שעפו מנגיעה: כבידה ואז ריחוף
   for (let i=fly.length-1;i>=0;i--){
     const p = fly[i];
+    // עלה מהערימה שמחכה לתורו לנשור: עדיין שוכב במקומו
+    if (p.wait > 0){ p.wait--; drawPetal(p, 1, p.flat); continue; }
+    if (p.leaf){
+      // נשירה של עלה: מאיץ לאט, מתנדנד לצדדים ומאט בכל נדנוד, מסתובב עם התנודה
+      p.ph += p.vp; const sw = Math.sin(p.ph);
+      p.vy = Math.min(p.vy + .07, p.vmax * (1 - Math.abs(sw)*.35));
+      p.x += sw * p.sway + p.vx; p.vx *= .99; p.y += p.vy - push*.6;
+      p.r += p.vr + Math.cos(p.ph)*.025;
+      if (p.x < -40 || p.x > W + 40){ fly.splice(i,1); continue; }
+      if (p.vy > 0 && p.y >= Hh - heights[binOf(p.x)] - p.s*.2){ land(p); fly.splice(i,1); continue; }
+      drawPetal(p, .3 + Math.abs(sw)*.7);
+      continue;
+    }
     p.vy = Math.min(p.vy + .14, 1.4); p.vx *= .985; p.ph += p.vp; p.r += p.vr;
     p.x += p.vx + (p.vy > 0 ? Math.sin(p.ph)*.6 : 0); p.y += p.vy - push*.6;
     if (p.x < -40 || p.x > W + 40 || p.y < -200){ fly.splice(i,1); continue; }
